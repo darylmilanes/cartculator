@@ -1,0 +1,628 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Cartculator</title>
+  <style>
+    :root {
+      --bg-color: #f3f4f6;
+      --card-bg: #ffffff;
+      --text-main: #1f2937;
+      --text-muted: #6b7280;
+      --border-color: #e5e7eb;
+      --status-color: #16a34a;
+      --primary: #2563eb;
+      --danger: #dc2626;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    body {
+      background-color: var(--bg-color);
+      color: var(--text-main);
+      padding: 12px;
+      display: flex;
+      justify-content: center;
+    }
+
+    .app-container {
+      width: 100%;
+      max-width: 440px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .header-card {
+      background: var(--card-bg);
+      border-radius: 16px;
+      padding: 16px;
+      box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);
+      border-top: 6px solid var(--status-color);
+      transition: border-color 0.3s ease;
+    }
+
+    .header-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 12px;
+    }
+
+    .app-title {
+      font-size: 1.25rem;
+      font-weight: 700;
+      color: var(--text-main);
+    }
+
+    .budget-input-group {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      background: #f9fafb;
+      padding: 6px 10px;
+      border-radius: 8px;
+      border: 1px solid var(--border-color);
+    }
+
+    .budget-input-group span {
+      font-weight: 600;
+      color: var(--text-muted);
+    }
+
+    .budget-input-group input {
+      border: none;
+      background: transparent;
+      width: 90px;
+      font-size: 1rem;
+      font-weight: 600;
+      outline: none;
+      color: var(--text-main);
+    }
+
+    .summary-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+      text-align: center;
+      margin-top: 8px;
+    }
+
+    .summary-box {
+      background: #f9fafb;
+      padding: 10px;
+      border-radius: 10px;
+    }
+
+    .summary-label {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 4px;
+    }
+
+    .summary-value {
+      font-size: 1.25rem;
+      font-weight: 700;
+    }
+
+    .summary-value.negative {
+      color: var(--danger);
+    }
+
+    .progress-bar-bg {
+      width: 100%;
+      height: 8px;
+      background: #e5e7eb;
+      border-radius: 4px;
+      overflow: hidden;
+      margin-top: 12px;
+    }
+
+    .progress-bar-fill {
+      height: 100%;
+      width: 0%;
+      background: var(--status-color);
+      transition: width 0.3s ease, background-color 0.3s ease;
+    }
+
+    .input-card {
+      background: var(--card-bg);
+      border-radius: 16px;
+      padding: 16px;
+      box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .input-row {
+      display: flex;
+      gap: 8px;
+    }
+
+    .field-group {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .field-group.price { flex: 2; }
+    .field-group.qty { flex: 1; }
+
+    label {
+      font-size: 0.75rem;
+      font-weight: 600;
+      color: var(--text-muted);
+    }
+
+    input[type="number"] {
+      width: 100%;
+      padding: 12px;
+      font-size: 1.1rem;
+      border: 1px solid var(--border-color);
+      border-radius: 10px;
+      outline: none;
+      background: #f9fafb;
+    }
+
+    input[type="number"]:focus {
+      border-color: var(--primary);
+      background: #fff;
+    }
+
+    .btn-add {
+      background: var(--primary);
+      color: white;
+      border: none;
+      border-radius: 10px;
+      padding: 14px;
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .btn-add:active {
+      opacity: 0.9;
+    }
+
+    .tools-row {
+      display: flex;
+      gap: 8px;
+    }
+
+    .btn-tool {
+      flex: 1;
+      padding: 10px 6px;
+      border: 1px solid var(--border-color);
+      background: #ffffff;
+      border-radius: 8px;
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: var(--text-main);
+      cursor: pointer;
+    }
+
+    .btn-tool:active {
+      background: #f3f4f6;
+    }
+
+    .btn-danger-text {
+      color: var(--danger);
+    }
+
+    .list-card {
+      background: var(--card-bg);
+      border-radius: 16px;
+      padding: 16px;
+      box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);
+      flex-grow: 1;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .list-header {
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: var(--text-muted);
+      margin-bottom: 8px;
+      display: flex;
+      justify-content: space-between;
+    }
+
+    .items-list {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      max-height: 280px;
+      overflow-y: auto;
+    }
+
+    .item-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 10px;
+      background: #f9fafb;
+      border-radius: 8px;
+      border: 1px solid var(--border-color);
+    }
+
+    .item-details {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+    }
+
+    .item-qty-badge {
+      background: #e5e7eb;
+      font-size: 0.75rem;
+      font-weight: 700;
+      padding: 2px 6px;
+      border-radius: 4px;
+    }
+
+    .item-price-calc {
+      font-size: 0.9rem;
+      color: var(--text-muted);
+    }
+
+    .item-subtotal {
+      font-weight: 700;
+      font-size: 0.95rem;
+    }
+
+    .btn-delete {
+      background: none;
+      border: none;
+      color: #9ca3af;
+      font-size: 1.1rem;
+      padding: 0 4px;
+      cursor: pointer;
+    }
+
+    .btn-delete:active {
+      color: var(--danger);
+    }
+
+    .empty-state {
+      text-align: center;
+      color: var(--text-muted);
+      font-size: 0.85rem;
+      padding: 24px 0;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="app-container">
+    <div class="header-card" id="headerCard">
+      <div class="header-top">
+        <div class="app-title">🛒 Cartculator</div>
+        <div class="budget-input-group">
+          <span>₱</span>
+          <input type="number" id="budgetInput" placeholder="Budget" inputmode="decimal" step="any">
+        </div>
+      </div>
+
+      <div class="summary-grid">
+        <div class="summary-box">
+          <div class="summary-label">Total Spent</div>
+          <div class="summary-value" id="totalSpentDisplay">₱0.00</div>
+        </div>
+        <div class="summary-box">
+          <div class="summary-label">Remaining</div>
+          <div class="summary-value" id="remainingDisplay">₱0.00</div>
+        </div>
+      </div>
+
+      <div class="progress-bar-bg">
+        <div class="progress-bar-fill" id="progressBar"></div>
+      </div>
+    </div>
+
+    <div class="input-card">
+      <form id="addItemForm" onsubmit="event.preventDefault(); handleAddItem();">
+        <div class="input-row">
+          <div class="field-group price">
+            <label for="priceInput">Price (₱)</label>
+            <input type="number" id="priceInput" placeholder="0.00" inputmode="decimal" step="any" required>
+          </div>
+          <div class="field-group qty">
+            <label for="qtyInput">Qty</label>
+            <input type="number" id="qtyInput" value="1" inputmode="numeric" min="1" step="1" required>
+          </div>
+        </div>
+        <button type="submit" class="btn-add" style="margin-top: 8px;">+ Add Price</button>
+      </form>
+
+      <div class="tools-row">
+        <button class="btn-tool" onclick="undoLastItem()">↩ Undo</button>
+        <button class="btn-tool" onclick="downloadReceiptPNG()">📄 PRINT</button>
+        <button class="btn-tool btn-danger-text" onclick="clearAllItems()">🗑 Clear</button>
+      </div>
+    </div>
+
+    <div class="list-card">
+      <div class="list-header">
+        <span>Items Tally</span>
+        <span id="itemCountDisplay">0 items</span>
+      </div>
+      <ul class="items-list" id="itemsList"></ul>
+    </div>
+  </div>
+
+  <script>
+    let state = {
+      budget: 0,
+      items: []
+    };
+
+    function formatMoney(amount) {
+      return Number(amount).toLocaleString('en-US', {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2
+      });
+    }
+
+    function initApp() {
+      const savedState = localStorage.getItem('cartculator_data');
+      if (savedState) {
+        try {
+          state = JSON.parse(savedState);
+        } catch (e) {
+          state = { budget: 0, items: [] };
+        }
+      }
+      
+      const budgetInput = document.getElementById('budgetInput');
+      budgetInput.value = state.budget > 0 ? state.budget : '';
+      
+      budgetInput.addEventListener('input', (e) => {
+        state.budget = parseFloat(e.target.value) || 0;
+        saveAndRender();
+      });
+
+      render();
+    }
+
+    function saveAndRender() {
+      localStorage.setItem('cartculator_data', JSON.stringify(state));
+      render();
+    }
+
+    function handleAddItem() {
+      const priceInput = document.getElementById('priceInput');
+      const qtyInput = document.getElementById('qtyInput');
+
+      const price = parseFloat(priceInput.value);
+      const qty = parseInt(qtyInput.value) || 1;
+
+      if (!isNaN(price) && price > 0) {
+        state.items.unshift({
+          id: Date.now(),
+          price: price,
+          qty: qty
+        });
+
+        priceInput.value = '';
+        qtyInput.value = '1';
+        priceInput.focus();
+
+        saveAndRender();
+      }
+    }
+
+    function deleteItem(id) {
+      state.items = state.items.filter(item => item.id !== id);
+      saveAndRender();
+    }
+
+    function undoLastItem() {
+      if (state.items.length > 0) {
+        state.items.shift();
+        saveAndRender();
+      }
+    }
+
+    function clearAllItems() {
+      if (state.items.length === 0) return;
+      if (confirm('Clear all items from your cart?')) {
+        state.items = [];
+        saveAndRender();
+      }
+    }
+
+    function downloadReceiptPNG() {
+      if (state.items.length === 0) {
+        alert('Cart is empty!');
+        return;
+      }
+
+      const canvas = document.createElement('canvas');
+      const ctx = canvas.getContext('2d');
+      
+      const width = 380;
+      const rowHeight = 28;
+      const headerHeight = 150;
+      const footerHeight = 160;
+      const height = headerHeight + (state.items.length * rowHeight) + footerHeight;
+
+      canvas.width = width;
+      canvas.height = height;
+
+      ctx.fillStyle = '#ffffff';
+      ctx.fillRect(0, 0, width, height);
+
+      ctx.fillStyle = '#000000';
+      ctx.textBaseline = 'top';
+
+      let y = 20;
+
+      ctx.font = 'bold 20px monospace';
+      ctx.textAlign = 'center';
+      ctx.fillText('CARTCULATOR', width / 2, y);
+      y += 28;
+
+      ctx.font = '12px monospace';
+      const now = new Date();
+      ctx.fillText(now.toLocaleString(), width / 2, y);
+      y += 22;
+
+      ctx.fillText('----------------------------------------', width / 2, y);
+      y += 18;
+
+      ctx.textAlign = 'left';
+      ctx.font = 'bold 12px monospace';
+      ctx.fillText('QTY   PRICE', 20, y);
+      ctx.textAlign = 'right';
+      ctx.fillText('TOTAL', width - 20, y);
+      y += 18;
+
+      ctx.textAlign = 'center';
+      ctx.font = '12px monospace';
+      ctx.fillText('----------------------------------------', width / 2, y);
+      y += 20;
+
+      const totalSpent = state.items.reduce((sum, item) => sum + (item.price * item.qty), 0);
+
+      ctx.font = '12px monospace';
+      state.items.forEach((item) => {
+        const itemTotal = item.price * item.qty;
+        ctx.textAlign = 'left';
+        ctx.fillText(`${item.qty}x    ₱${formatMoney(item.price)}`, 20, y);
+        ctx.textAlign = 'right';
+        ctx.fillText(`₱${formatMoney(itemTotal)}`, width - 20, y);
+        y += rowHeight;
+      });
+
+      ctx.textAlign = 'center';
+      ctx.fillText('----------------------------------------', width / 2, y);
+      y += 20;
+
+      const remaining = state.budget - totalSpent;
+
+      ctx.font = '13px monospace';
+
+      ctx.textAlign = 'left';
+      ctx.fillText('Budget:', 20, y);
+      ctx.textAlign = 'right';
+      ctx.fillText(`₱${formatMoney(state.budget)}`, width - 20, y);
+      y += 22;
+
+      ctx.textAlign = 'left';
+      ctx.fillText('Total Spent:', 20, y);
+      ctx.textAlign = 'right';
+      ctx.fillText(`₱${formatMoney(totalSpent)}`, width - 20, y);
+      y += 22;
+
+      ctx.textAlign = 'left';
+      ctx.fillText('Remaining:', 20, y);
+      ctx.textAlign = 'right';
+      if (remaining < 0) {
+        ctx.fillStyle = '#dc2626';
+        ctx.fillText(`-₱${formatMoney(Math.abs(remaining))}`, width - 20, y);
+        ctx.fillStyle = '#000000';
+      } else {
+        ctx.fillText(`₱${formatMoney(remaining)}`, width - 20, y);
+      }
+      y += 30;
+
+      ctx.textAlign = 'center';
+      ctx.font = 'bold 12px monospace';
+      ctx.fillText('*** THANK YOU ***', width / 2, y);
+
+      const link = document.createElement('a');
+      link.download = `cartculator-receipt-${Date.now()}.png`;
+      link.href = canvas.toDataURL('image/png');
+      link.click();
+    }
+
+    function render() {
+      const totalSpent = state.items.reduce((sum, item) => sum + (item.price * item.qty), 0);
+      const totalItemCount = state.items.reduce((sum, item) => sum + item.qty, 0);
+      const remaining = state.budget - totalSpent;
+
+      document.getElementById('totalSpentDisplay').textContent = `₱${formatMoney(totalSpent)}`;
+      
+      const remainingDisplay = document.getElementById('remainingDisplay');
+      
+      if (remaining < 0) {
+        remainingDisplay.textContent = `-₱${formatMoney(Math.abs(remaining))}`;
+        remainingDisplay.classList.add('negative');
+      } else {
+        remainingDisplay.textContent = `₱${formatMoney(remaining)}`;
+        remainingDisplay.classList.remove('negative');
+      }
+
+      document.getElementById('itemCountDisplay').textContent = `${totalItemCount} item${totalItemCount !== 1 ? 's' : ''}`;
+
+      updateStatusColors(totalSpent, state.budget);
+      renderList();
+    }
+
+    function updateStatusColors(spent, budget) {
+      const progressBar = document.getElementById('progressBar');
+      
+      let color = '#16a34a'; // Green
+      let percent = 0;
+
+      if (budget > 0) {
+        percent = Math.min((spent / budget) * 100, 100);
+        const ratio = spent / budget;
+
+        if (ratio >= 1) {
+          color = '#dc2626'; // Red (Over Budget)
+        } else if (ratio >= 0.8) {
+          color = '#d97706'; // Yellow/Amber (Warning)
+        }
+      }
+
+      document.documentElement.style.setProperty('--status-color', color);
+      progressBar.style.width = `${percent}%`;
+      progressBar.style.backgroundColor = color;
+    }
+
+    function renderList() {
+      const listElement = document.getElementById('itemsList');
+      listElement.innerHTML = '';
+
+      if (state.items.length === 0) {
+        listElement.innerHTML = '<div class="empty-state">Cart is empty. Add a price to begin!</div>';
+        return;
+      }
+
+      state.items.forEach(item => {
+        const itemTotal = item.price * item.qty;
+        const li = document.createElement('li');
+        li.className = 'item-row';
+        li.innerHTML = `
+          <div class="item-details">
+            ${item.qty > 1 ? `<span class="item-qty-badge">${item.qty}x</span>` : ''}
+            <span class="item-price-calc">₱${formatMoney(item.price)}</span>
+          </div>
+          <div style="display: flex; align-items: center; gap: 12px;">
+            <span class="item-subtotal">₱${formatMoney(itemTotal)}</span>
+            <button class="btn-delete" onclick="deleteItem(${item.id})">✕</button>
+          </div>
+        `;
+        listElement.appendChild(li);
+      });
+    }
+
+    window.onload = initApp;
+  </script>
+</body>
+</html>
